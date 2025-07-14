@@ -1,0 +1,10 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: 'nomad-services'
+    static_configs:
+      - targets:
+          - order-service.service.consul:3000
+          - payment-service.service.consul:3001
+          - notification-service.service.consul:3002

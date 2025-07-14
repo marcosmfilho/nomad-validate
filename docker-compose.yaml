@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"       # Porta AMQP
+      - "15672:15672"     # UI do RabbitMQ
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    restart: always
+
+  order-service:
+    build: ./services/order-service
+    ports:
+      - "3000:3000"
+    environment:
+      RABBITMQ_URL: amqp://rabbitmq:5672
+    depends_on:
+      - rabbitmq
+    restart: always
+
+  payment-service:
+    build: ./services/payment-service
+    ports:
+      - "3001:3001"
+    environment:
+      RABBITMQ_URL: amqp://rabbitmq:5672
+    depends_on:
+      - rabbitmq
+    restart: always
+
+  notification-service:
+    build: ./services/notification-service
+    ports:
+      - "3002:3002"
+    environment:
+      RABBITMQ_URL: amqp://rabbitmq:5672
+    depends_on:
+      - rabbitmq
+    restart: always
+
+  locust:
+    image: locustio/locust
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./locust:/mnt/locust
+    working_dir: /mnt/locust
+    command: >
+      locust -f locustfile.py --host http://order-service:3000
+    depends_on:
+      - order-service
+    restart: always

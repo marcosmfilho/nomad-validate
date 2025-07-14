@@ -1,5 +1,6 @@
 job "rabbitmq" {
   datacenters = ["dc1"]
+  type        = "service"
 
   group "rabbit" {
     count = 1
@@ -8,38 +9,30 @@ job "rabbitmq" {
       port "amqp" {
         static = 5672
       }
+
       port "management" {
         static = 15672
       }
     }
 
     service {
-      name = "rabbitmq"
-      port = "amqp"
-
-      check {
-        type     = "tcp"
-        interval = "10s"
-        timeout  = "2s"
-      }
+      name     = "rabbitmq"
+      port     = "amqp"
+      provider = "nomad"
     }
 
-    task "rabbit" {
+    task "rabbitmq" {
       driver = "docker"
 
       config {
-        image = "rabbitmq:3-management"
+        image = "rabbitmq:3.13-management"
         ports = ["amqp", "management"]
+        hostname = "rabbitmq"
       }
 
       resources {
         cpu    = 300
         memory = 256
-      }
-
-      env {
-        RABBITMQ_DEFAULT_USER = "guest"
-        RABBITMQ_DEFAULT_PASS = "guest"
       }
     }
   }

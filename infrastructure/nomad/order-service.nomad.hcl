@@ -13,7 +13,7 @@ job "order-service" {
     service {
       name = "order-service"
       port = "http"
-
+      provider = "nomad"
       tags = [
         "traefik.enable=true",
         "traefik.http.routers.order.rule=PathPrefix(`/order`)",
@@ -32,17 +32,21 @@ job "order-service" {
       driver = "docker"
 
       config {
-        image = "order-service:latest"
+        image = "localhost:5000/order-service:latest"
         ports = ["http"]
       }
 
-      env {
-        RABBITMQ_URL = "amqp://rabbitmq.service.consul:5672"
+      template {
+        data = <<EOT
+          RABBITMQ_URL=amqp://{{ range nomadService "rabbitmq" }}{{ .Address }}:{{ .Port }}{{ end }}
+        EOT
+        destination = "secrets/env_vars.env"
+        env         = true
       }
 
       resources {
-        cpu    = 200
-        memory = 128
+        cpu    = 500
+        memory = 512
       }
     }
   }

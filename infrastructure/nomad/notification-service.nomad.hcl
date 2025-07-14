@@ -13,11 +13,11 @@ job "notification-service" {
     service {
       name = "notification-service"
       port = "http"
-
+      provider = "nomad"
       tags = [
         "traefik.enable=true",
-        "traefik.http.routers.notification.rule=PathPrefix(`/notify`)",
-        "traefik.http.services.notification.loadbalancer.server.port=3002"
+        "traefik.http.routers.notification.rule=PathPrefix(`/notification`)",
+        "traefik.http.services.notification.loadbalancer.server.port=3003"
       ]
 
       check {
@@ -32,17 +32,21 @@ job "notification-service" {
       driver = "docker"
 
       config {
-        image = "notification-service:latest"
+        image = "localhost:5000/notification-service:latest"
         ports = ["http"]
       }
 
-      env {
-        RABBITMQ_URL = "amqp://rabbitmq.service.consul:5672"
+      template {
+        data = <<EOT
+          RABBITMQ_URL=amqp://{{ range nomadService "rabbitmq" }}{{ .Address }}:{{ .Port }}{{ end }}
+        EOT
+        destination = "secrets/env_vars.env"
+        env         = true
       }
 
       resources {
-        cpu    = 200
-        memory = 128
+        cpu    = 500
+        memory = 512
       }
     }
   }

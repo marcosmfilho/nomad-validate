@@ -13,7 +13,7 @@ job "mongodb" {
     service {
       name = "mongodb"
       port = "db"
-
+      provider = "nomad"
       check {
         type     = "tcp"
         interval = "10s"
@@ -34,7 +34,6 @@ job "mongodb" {
         memory = 256
       }
 
-      # Descomente se quiser volume persistente depois
       # volume_mount {
       #   volume      = "mongo_data"
       #   destination = "/data/db"

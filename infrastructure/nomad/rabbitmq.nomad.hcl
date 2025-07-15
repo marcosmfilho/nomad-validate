@@ -19,20 +19,27 @@ job "rabbitmq" {
       name     = "rabbitmq"
       port     = "amqp"
       provider = "nomad"
+      tags = ["traefik.enable=false"]
+
+      check_restart {
+        limit           = 3
+        grace           = "30s"
+        ignore_warnings = true
+      }
     }
 
     task "rabbitmq" {
       driver = "docker"
 
       config {
-        image = "rabbitmq:3.13-management"
-        ports = ["amqp", "management"]
+        image    = "rabbitmq:3.13-management"
+        ports    = ["amqp", "management"]
         hostname = "rabbitmq"
       }
 
       resources {
-        cpu    = 300
-        memory = 256
+        cpu    = 500
+        memory = 512
       }
     }
   }

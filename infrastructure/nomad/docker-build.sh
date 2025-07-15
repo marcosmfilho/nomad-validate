@@ -22,6 +22,8 @@ REGISTRY="localhost:5000"
 # Caminho base (ajuste se necessário)
 BASE_DIR=$(pwd)
 
+VERSION=$1
+
 for SERVICE in "${SERVICES[@]}"; do
   echo "🔧 Buildando imagem do serviço: $SERVICE"
 
@@ -31,13 +33,13 @@ for SERVICE in "${SERVICES[@]}"; do
   }
 
   # Build da imagem
-  docker build -t "$SERVICE:latest" .
+  docker build -t "$SERVICE:$VERSION" .
 
   # Tag para o registry local
-  docker tag "$SERVICE:latest" "$REGISTRY/$SERVICE:latest"
+  docker tag "$SERVICE:$VERSION" "$REGISTRY/$SERVICE:$VERSION"
 
   # Push para o registry local
-  docker push "$REGISTRY/$SERVICE:latest"
+  docker push "$REGISTRY/$SERVICE:$VERSION"
 
   echo "✅ $SERVICE enviado para $REGISTRY"
 done

@@ -5,20 +5,19 @@ const app = express();
 const PORT = process.env.PORT || 3002;
 const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://rabbitmq:5672';
 
-let channel: amqplib.Channel;
+let channel: amqplib.Channel | null = null;
 
 async function wait(ms: number) {
   return new Promise((res) => setTimeout(res, ms));
 }
 
-async function initRabbitMQ() {
-  const maxRetries = 10;
+async function connectRabbitMQ() {
   let attempt = 0;
 
-  while (attempt < maxRetries) {
+  while (true) {
     try {
-      const conn = await amqplib.connect(RABBITMQ_URL);
-      channel = await conn.createChannel();
+      const connection = await amqplib.connect(RABBITMQ_URL);
+      channel = await connection.createChannel();
 
       await channel.assertExchange('payments', 'fanout', { durable: false });
 
@@ -33,20 +32,31 @@ async function initRabbitMQ() {
       }, { noAck: true });
 
       console.log('✅ Connected to RabbitMQ and consuming from payments');
-      return;
+
+      connection.on('close', () => {
+        console.warn('⚠️ RabbitMQ connection closed. Reconnecting...');
+        channel = null;
+        connectRabbitMQ();
+      });
+
+      connection.on('error', (err) => {
+        console.error('❌ RabbitMQ connection error:', err);
+      });
+
+      break;
     } catch (err) {
       attempt++;
       console.error(`❌ Failed to connect to RabbitMQ (attempt ${attempt})`);
-      await wait(2000);
+      await wait(2000 * Math.min(attempt, 10));
     }
   }
-
-  throw new Error('❌ Could not connect to RabbitMQ');
 }
 
-app.get('/health', (_req, res) => res.send('ok'));
+app.get('/health', (_req, res) => {
+  res.status(200).json({ status: 'ok', rabbitmq: channel ? 'connected' : 'disconnected' });
+});
 
-app.listen(PORT, async () => {
-  console.log(`Notification Service listening on port ${PORT}`);
-  await initRabbitMQ();
+app.listen(PORT, () => {
+  console.log(`🚀 Notification Service listening on port ${PORT}`);
+  connectRabbitMQ();
 });

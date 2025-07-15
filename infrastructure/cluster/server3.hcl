@@ -21,3 +21,10 @@ advertise {
   rpc  = "192.168.0.126"
   serf = "192.168.0.126"
 }
+
+telemetry {
+  prometheus_metrics         = true
+  collection_interval        = "5s"
+  publish_allocation_metrics = true
+  publish_node_metrics       = true
+}

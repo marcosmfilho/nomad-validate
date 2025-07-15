@@ -3,6 +3,18 @@ job "traefik" {
   datacenters = ["dc1"]
   type        = "service"
 
+  update {
+      max_parallel      = 1
+      health_check      = "checks"
+      min_healthy_time  = "10s"
+      healthy_deadline  = "20m"
+      progress_deadline = "30m"
+      auto_revert       = false
+      auto_promote      = false
+      canary            = 0
+      stagger           = "30s"
+  }
+
   group "traefik" {
     network {
       port "http" {
@@ -24,13 +36,13 @@ job "traefik" {
       provider = "nomad"
       port     = "http"
 
-      check {
-        name     = "alive"
-        type     = "tcp"
-        port     = "http"
-        interval = "10s"
-        timeout  = "2s"
-      }
+      # check {
+      #   name     = "alive"
+      #   type     = "tcp"
+      #   port     = "http"
+      #   interval = "10s"
+      #   timeout  = "2s"
+      # }
     }
 
     task "traefik" {

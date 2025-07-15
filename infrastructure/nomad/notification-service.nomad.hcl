@@ -1,5 +1,19 @@
 job "notification-service" {
+  region      = "global"
   datacenters = ["dc1"]
+  type        = "service"
+
+  update {
+        max_parallel      = 1
+        health_check      = "checks"
+        min_healthy_time  = "10s"
+        healthy_deadline  = "20m"
+        progress_deadline = "30m"
+        auto_revert       = false
+        auto_promote      = false
+        canary            = 0
+        stagger           = "30s"
+  }
 
   group "notification" {
     count = 1
@@ -18,13 +32,6 @@ job "notification-service" {
         "traefik.enable=true",
         "traefik.http.routers.notification.rule=PathPrefix(`/notification`)",
       ]
-
-      check {
-        type     = "http"
-        path     = "/health"
-        interval = "10s"
-        timeout  = "2s"
-      }
     }
 
     task "notification" {

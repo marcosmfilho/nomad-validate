@@ -3,6 +3,18 @@ job "grafana" {
   datacenters = ["dc1"]
   type        = "service"
 
+  update {
+        max_parallel      = 1
+        health_check      = "checks"
+        min_healthy_time  = "10s"
+        healthy_deadline  = "20m"
+        progress_deadline = "30m"
+        auto_revert       = false
+        auto_promote      = false
+        canary            = 0
+        stagger           = "30s"
+  }
+
   group "grafana" {
     network {
       port "web" {
@@ -21,14 +33,6 @@ job "grafana" {
       provider = "nomad"
       port     = "web"
       tags = ["traefik.enable=false"]
-
-      check {
-        name     = "alive"
-        type     = "tcp"
-        port     = "web"
-        interval = "10s"
-        timeout  = "2s"
-      }
     }
 
     task "grafana" {
@@ -37,7 +41,6 @@ job "grafana" {
       config {
         image        = "grafana/grafana:10.4.2"
         ports        = ["web"]
-        network_mode = "host"
         volumes = [
           "local/grafana.ini:/etc/grafana/grafana.ini"
         ]

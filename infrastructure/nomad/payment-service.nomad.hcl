@@ -1,5 +1,20 @@
 job "payment-service" {
+
+  region      = "global"
   datacenters = ["dc1"]
+  type        = "service"
+
+  update {
+        max_parallel      = 1
+        health_check      = "checks"
+        min_healthy_time  = "10s"
+        healthy_deadline  = "20m"
+        progress_deadline = "30m"
+        auto_revert       = false
+        auto_promote      = false
+        canary            = 0
+        stagger           = "30s"
+  }
 
   group "payment" {
     count = 1
@@ -18,13 +33,6 @@ job "payment-service" {
         "traefik.enable=true",
         "traefik.http.routers.payment.rule=PathPrefix(`/payment`)",
       ]
-
-      check {
-        type     = "http"
-        path     = "/health"
-        interval = "10s"
-        timeout  = "2s"
-      }
     }
 
     task "payment" {

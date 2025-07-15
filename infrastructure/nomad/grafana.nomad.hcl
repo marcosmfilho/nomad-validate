@@ -1,28 +1,31 @@
 job "grafana" {
+  region      = "global"
   datacenters = ["dc1"]
+  type        = "service"
 
   group "grafana" {
-    count = 1
-
     network {
       port "web" {
-        static = 3000
+        static = 3005
       }
     }
 
-    service {
-      name = "grafana"
-      port = "web"
+    volume "grafana_data" {
+      type      = "host"
+      read_only = false
+      source    = "grafana_data"
+    }
 
-      tags = [
-        "traefik.enable=true",
-        "traefik.http.routers.grafana.rule=PathPrefix(`/grafana`)",
-        "traefik.http.services.grafana.loadbalancer.server.port=3000"
-      ]
+    service {
+      name     = "grafana"
+      provider = "nomad"
+      port     = "web"
+      tags = ["traefik.enable=false"]
 
       check {
-        type     = "http"
-        path     = "/login"
+        name     = "alive"
+        type     = "tcp"
+        port     = "web"
         interval = "10s"
         timeout  = "2s"
       }
@@ -32,18 +35,48 @@ job "grafana" {
       driver = "docker"
 
       config {
-        image = "grafana/grafana:10.2.0"
-        ports = ["web"]
+        image        = "grafana/grafana:10.4.2"
+        ports        = ["web"]
+        network_mode = "host"
+        volumes = [
+          "local/grafana.ini:/etc/grafana/grafana.ini"
+        ]
       }
 
-      env {
-        GF_SECURITY_ADMIN_USER     = "admin"
-        GF_SECURITY_ADMIN_PASSWORD = "admin"
+      template {
+        data = <<EOF
+        [server]
+        http_port = 3005
+
+        [auth.anonymous]
+        enabled = true
+        org_role = Admin
+
+        [security]
+        admin_user = admin
+        admin_password = admin
+
+        [datasources]
+          [[datasources]]
+          name = Prometheus
+          type = prometheus
+          access = proxy
+          url = http://127.0.0.1:9090
+          isDefault = true
+        EOF
+
+        destination = "local/grafana.ini"
       }
 
       resources {
-        cpu    = 200
-        memory = 256
+        cpu    = 500
+        memory = 512
+      }
+
+      volume_mount {
+        volume      = "grafana_data"
+        destination = "/var/lib/grafana"
+        read_only   = false
       }
     }
   }

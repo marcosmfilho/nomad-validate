@@ -16,8 +16,7 @@ job "order-service" {
       provider = "nomad"
       tags = [
         "traefik.enable=true",
-        "traefik.http.routers.order.rule=PathPrefix(`/order`)",
-        "traefik.http.services.order.loadbalancer.server.port=3000"
+        "traefik.http.routers.order.rule=PathPrefix(`/order`)"
       ]
 
       check {
@@ -32,7 +31,7 @@ job "order-service" {
       driver = "docker"
 
       config {
-        image = "localhost:5000/order-service:latest"
+        image = "localhost:5000/order-service:1.1.0"
         ports = ["http"]
       }
 

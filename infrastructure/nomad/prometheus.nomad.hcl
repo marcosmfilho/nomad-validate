@@ -1,9 +1,9 @@
 job "prometheus" {
+  region      = "global"
   datacenters = ["dc1"]
+  type        = "service"
 
-  group "prometheus" {
-    count = 1
-
+  group "monitoring" {
     network {
       port "web" {
         static = 9090
@@ -11,18 +11,15 @@ job "prometheus" {
     }
 
     service {
-      name = "prometheus"
-      port = "web"
-
-      tags = [
-        "traefik.enable=true",
-        "traefik.http.routers.prom.rule=PathPrefix(`/prometheus`)",
-        "traefik.http.services.prom.loadbalancer.server.port=9090"
-      ]
+      name     = "prometheus"
+      provider = "nomad"
+      port     = "web"
+      tags = ["traefik.enable=false"]
 
       check {
-        type     = "http"
-        path     = "/-/healthy"
+        name     = "alive"
+        type     = "tcp"
+        port     = "web"
         interval = "10s"
         timeout  = "2s"
       }
@@ -32,17 +29,59 @@ job "prometheus" {
       driver = "docker"
 
       config {
-        image = "prom/prometheus:v2.52.0"
-        ports = ["web"]
-        volumes = [
-          "local/prometheus.yml:/etc/prometheus/prometheus.yml"
-        ]
+        image        = "prom/prometheus:latest"
+        network_mode = "host"
+        ports        = ["web"]
+        volumes      = ["local/prometheus.yml:/etc/prometheus/prometheus.yml"]
       }
 
       template {
-        data        = <<EOF
-{{ file "infrastructure/prometheus/prometheus.yml" }}
-EOF
+        data = <<EOF
+          global:
+            scrape_interval: 5s
+            evaluation_interval: 5s
+
+          scrape_configs:
+            - job_name: "prometheus"
+              static_configs:
+                - targets: ["localhost:9090"]
+
+            - job_name: "nomad-server1"
+              metrics_path: /v1/metrics
+              params:
+                format: [prometheus]
+              static_configs:
+                - targets: ["192.168.0.126:4670"]  # porta http do server1
+
+            - job_name: "nomad-server2"
+              metrics_path: /v1/metrics
+              params:
+                format: [prometheus]
+              static_configs:
+                - targets: ["192.168.0.126:4656"]  # porta http do server2
+
+            - job_name: "nomad-server3"
+              metrics_path: /v1/metrics
+              params:
+                format: [prometheus]
+              static_configs:
+                - targets: ["192.168.0.126:4666"]  # porta http do server3
+
+            - job_name: "nomad-client1"
+              metrics_path: /v1/metrics
+              params:
+                format: [prometheus]
+              static_configs:
+                - targets: ["192.168.0.126:5656"]  # client1
+
+            - job_name: "nomad-client2"
+              metrics_path: /v1/metrics
+              params:
+                format: [prometheus]
+              static_configs:
+                - targets: ["192.168.0.126:5657"]  # client2
+          EOF
+
         destination = "local/prometheus.yml"
       }
 

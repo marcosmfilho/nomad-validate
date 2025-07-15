@@ -53,13 +53,6 @@ job "traefik" {
             [entryPoints]
               [entryPoints.http]
                 address = ":80"
-                [entryPoints.http.http.redirections.entryPoint]
-                  to = "https"
-                  scheme = "https"
-
-              [entryPoints.https]
-                address = ":443"
-                [entryPoints.https.http.tls]
 
               [entryPoints.traefik]
                 address = ":8081"

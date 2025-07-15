@@ -17,7 +17,6 @@ job "payment-service" {
       tags = [
         "traefik.enable=true",
         "traefik.http.routers.payment.rule=PathPrefix(`/payment`)",
-        "traefik.http.services.payment.loadbalancer.server.port=3002"
       ]
 
       check {
@@ -32,7 +31,7 @@ job "payment-service" {
       driver = "docker"
 
       config {
-        image = "localhost:5000/payment-service:latest"
+        image = "localhost:5000/payment-service:1.1.0"
         ports = ["http"]
       }
 

@@ -17,7 +17,6 @@ job "notification-service" {
       tags = [
         "traefik.enable=true",
         "traefik.http.routers.notification.rule=PathPrefix(`/notification`)",
-        "traefik.http.services.notification.loadbalancer.server.port=3003"
       ]
 
       check {
@@ -32,7 +31,7 @@ job "notification-service" {
       driver = "docker"
 
       config {
-        image = "localhost:5000/notification-service:latest"
+        image = "localhost:5000/notification-service:1.1.0"
         ports = ["http"]
       }
 

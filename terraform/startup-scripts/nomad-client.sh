@@ -16,6 +16,9 @@ rm nomad.zip
 mkdir -p /etc/nomad.d /opt/nomad
 chmod a+w /etc/nomad.d /opt/nomad
 
+mkdir -p /opt/grafana/data
+chmod a+w /opt/grafana/data
+
 # Configuração do Nomad Client
 cat <<EOF > /etc/nomad.d/nomad.hcl
 data_dir = "/opt/nomad"
@@ -23,9 +26,14 @@ bind_addr = "0.0.0.0"
 log_level = "INFO"
 
 client {
-  enabled = true
-  servers = ["nomad-server-1", "nomad-server-2", "nomad-server-3"]
+    enabled = true
+    servers = ["nomad-server-1", "nomad-server-2", "nomad-server-3"]
+    host_volume "grafana_data" {
+        path      = "/opt/grafana/data"
+        read_only = false
+    }
 }
+
 telemetry {
     prometheus_metrics = true
     publish_allocation_metrics = true

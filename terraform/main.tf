@@ -47,6 +47,10 @@ resource "google_compute_instance" "nomad_server" {
     access_config {}
   }
 
+  metadata = {
+    github_token = var.github_token
+  }
+
   metadata_startup_script = file("startup-scripts/nomad-server.sh")
 
   tags = ["nomad"]

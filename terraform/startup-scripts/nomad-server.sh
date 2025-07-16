@@ -17,6 +17,12 @@ mkdir -p /opt/nomad
 # IP local da interface padrão
 PRIVATE_IP=$(hostname -I | awk '{print $1}')
 
+# Recupera token do GitHub do metadata da VM
+GITHUB_TOKEN=$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/attributes/github_token)
+
+# Clona o repositório privado do GitHub contendo os arquivos .hcl
+git clone https://${GITHUB_TOKEN}@github.com/marcosmfilho/nomad-validate.git /opt/nomad/jobs
+
 # Configura Nomad server
 cat <<EOF > /etc/nomad.d/nomad.hcl
 data_dir  = "/opt/nomad"

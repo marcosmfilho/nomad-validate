@@ -14,3 +14,9 @@ variable "zone" {
   type        = string
   default     = "us-central1-a"
 }
+
+variable "github_token" {
+  type        = string
+  description = "GitHub Personal Access Token para clonar o repositório privado"
+  sensitive   = true
+}

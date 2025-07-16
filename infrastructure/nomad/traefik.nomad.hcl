@@ -84,7 +84,7 @@ job "traefik" {
             [providers]
               [providers.nomad]
                 [providers.nomad.endpoint]
-                  address = "http://127.0.0.1:4670"
+                  address = "http://127.0.0.1:4646"
               # [providers.consulcatalog]
               #   [providers.consulcatalog.endpoint]
               #     address = "http://127.0.0.1:8500"

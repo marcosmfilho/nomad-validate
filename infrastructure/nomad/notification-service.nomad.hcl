@@ -38,7 +38,7 @@ job "notification-service" {
       driver = "docker"
 
       config {
-        image = "localhost:5000/notification-service:1.1.0"
+        image = "ghcr.io/marcosmfilho/notification-service:1.0.0"
         ports = ["http"]
       }
 

@@ -39,7 +39,7 @@ job "order-service" {
       driver = "docker"
 
       config {
-        image = "localhost:5000/order-service:1.1.0"
+        image = "ghcr.io/marcosmfilho/order-service:1.0.0"
         ports = ["http"]
       }
 

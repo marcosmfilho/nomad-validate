@@ -39,7 +39,7 @@ job "payment-service" {
       driver = "docker"
 
       config {
-        image = "localhost:5000/payment-service:1.1.0"
+        image = "ghcr.io/marcosmfilho/payment-service:1.0.0"
         ports = ["http"]
       }
 

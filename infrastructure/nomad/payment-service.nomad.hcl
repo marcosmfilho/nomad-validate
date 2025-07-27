@@ -21,7 +21,7 @@ job "payment-service" {
 
     network {
       port "http" {
-        static = 3001
+        to = 3001
       }
     }
 

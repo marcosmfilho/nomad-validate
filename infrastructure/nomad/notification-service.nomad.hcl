@@ -20,7 +20,7 @@ job "notification-service" {
 
     network {
       port "http" {
-        static = 3002
+        to = 3002
       }
     }
 

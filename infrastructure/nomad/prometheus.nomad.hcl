@@ -47,42 +47,42 @@ job "prometheus" {
             scrape_configs:
               - job_name: "prometheus"
                 static_configs:
-                  - targets: ["localhost:9090"]
+                  - targets: ["10.0.0.6:9090"]
 
               - job_name: "nomad-server-1"
                 metrics_path: /v1/metrics
                 params:
                   format: [prometheus]
                 static_configs:
-                  - targets: ["192.168.0.126:4670"]
+                  - targets: ["10.0.0.3:4648"]
 
               - job_name: "nomad-server-2"
                 metrics_path: /v1/metrics
                 params:
                   format: [prometheus]
                 static_configs:
-                  - targets: ["192.168.0.126:4656"]
+                  - targets: ["10.0.0.2:4648"]
 
               - job_name: "nomad-server-3"
                 metrics_path: /v1/metrics
                 params:
                   format: [prometheus]
                 static_configs:
-                  - targets: ["192.168.0.126:4666"]
+                  - targets: ["10.0.0.4:4648"]
 
               - job_name: "nomad-client-1"
                 metrics_path: /v1/metrics
                 params:
                   format: [prometheus]
                 static_configs:
-                  - targets: ["192.168.0.126:5656"]
+                  - targets: ["10.0.0.5:4646"]
 
               - job_name: "nomad-client-2"
                 metrics_path: /v1/metrics
                 params:
                   format: [prometheus]
                 static_configs:
-                  - targets: ["192.168.0.126:5657"]
+                  - targets: ["10.0.0.6:4646"]
 
           EOF
 

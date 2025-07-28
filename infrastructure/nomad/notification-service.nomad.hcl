@@ -4,15 +4,15 @@ job "notification-service" {
   type        = "service"
 
   update {
-        max_parallel      = 1
-        health_check      = "checks"
-        min_healthy_time  = "10s"
-        healthy_deadline  = "20m"
-        progress_deadline = "30m"
-        auto_revert       = false
-        auto_promote      = false
-        canary            = 0
-        stagger           = "30s"
+    max_parallel      = 1
+    health_check      = "checks"
+    min_healthy_time  = "30s"
+    healthy_deadline  = "3m"
+    progress_deadline = "5m"
+    auto_revert       = false
+    auto_promote      = true
+    canary            = 2
+    stagger           = "15s"
   }
 
   group "notification" {

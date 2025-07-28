@@ -116,6 +116,51 @@ Parâmetros sugeridos:
 
 ---
 
+## 🌐 Provisionamento com Terraform
+
+O Terraform é utilizado neste projeto para provisionar toda a infraestrutura necessária no Google Cloud Platform (GCP). Ele configura redes, firewalls, instâncias de servidores e clientes Nomad, além de outros recursos essenciais.
+
+### Principais Recursos Provisionados:
+- **Rede e Sub-rede**: Configuração de uma rede privada para comunicação segura entre os serviços.
+- **Firewall**: Regras de acesso para permitir comunicação entre os serviços e acesso externo aos endpoints.
+- **Servidores Nomad**: Três instâncias configuradas para atuar como servidores no cluster Nomad.
+- **Clientes Nomad**: Um grupo gerenciado de instâncias para executar as tarefas alocadas.
+- **Startup Scripts**: Scripts de inicialização para configurar automaticamente os servidores e clientes Nomad.
+
+### Como usar:
+1. Configure as variáveis no arquivo `terraform/terraform.tfvars`:
+   ```hcl
+   project_id = "seu-projeto"
+   region     = "us-central1"
+   zone       = "us-central1-a"
+   github_token = "seu-token-github"
+   ```
+
+2. Inicialize o Terraform:
+   ```bash
+   terraform init
+   ```
+
+3. Planeje as mudanças:
+   ```bash
+   terraform plan
+   ```
+
+4. Aplique as mudanças:
+   ```bash
+   terraform apply
+   ```
+
+Após a execução, o Terraform provisionará todos os recursos necessários e exibirá os IPs dos servidores Nomad e outros detalhes úteis.
+
+### Outputs:
+- **nomad_server_ips**: Lista de IPs públicos dos servidores Nomad.
+- **nomad_client_group**: Nome do grupo de instâncias dos clientes Nomad.
+
+Para mais detalhes, consulte os arquivos na pasta `terraform/`.
+
+---
+
 ## 📦 Estrutura do Projeto
 
 ```
